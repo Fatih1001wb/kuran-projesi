@@ -9,7 +9,6 @@ function QuranPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mode, setMode] = useState("arabic");
   const [apiAyetler, setApiAyetler] = useState([]);
-  const [translationId, setTranslationId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [playingId, setPlayingId] = useState(null);
   const [translitCache, setTranslitCache] = useState({});
@@ -119,64 +118,89 @@ function QuranPage() {
   }, [page, sureNameMap]);
 
   useEffect(() => {
-    const fetchTranslations = async () => {
-      try {
-        const response = await fetch(
-          "https://api.quran.com/api/v4/resources/translations?language=tr",
-        );
-        if (!response.ok) throw new Error("API hatası");
-        const data = await response.json();
-        const translations = data.translations || [];
-        const diyanet = translations.find((t) =>
-          (t.name || "").toLowerCase().includes("diyanet"),
-        );
-        setTranslationId(diyanet?.id || translations[0]?.id || null);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchTranslations();
-  }, []);
-
-  useEffect(() => {
     const fetchVerses = async () => {
-      if (!page || !translationId) return;
+      if (!page) return;
       setLoading(true);
       try {
-        const response = await fetch(
-          `https://api.quran.com/api/v4/verses/by_page/${page}?language=tr&words=false&translations=${translationId}&fields=text_uthmani,text_imlaei,text_uthmani_simple&per_page=300`,
+        const [arabicResponse, turkishResponse] = await Promise.all([
+          fetch(`https://api.alquran.cloud/v1/page/${page}/quran-uthmani`),
+          fetch(`https://api.alquran.cloud/v1/page/${page}/tr.diyanet`),
+        ]);
+        if (!arabicResponse.ok || !turkishResponse.ok) {
+          throw new Error("API hatası");
+        }
+        const arabicData = await arabicResponse.json();
+        const turkishData = await turkishResponse.json();
+        const arabicAyahs = arabicData?.data?.ayahs || [];
+        const turkishAyahs = turkishData?.data?.ayahs || [];
+        const turkishMap = new Map(
+          turkishAyahs.map((ayah) => [
+            `${ayah.surah?.number}:${ayah.numberInSurah}`,
+            ayah.text,
+          ]),
         );
-        if (!response.ok) throw new Error("API hatası");
-        const data = await response.json();
-        const verses = data.verses || [];
-        const mapped = verses.map((verse) => {
-          const arapca =
-            verse.text_uthmani ||
-            verse.text_imlaei ||
-            verse.text_uthmani_simple ||
-            "";
-          const [sureNo, ayetNo] = String(verse.verse_key || "").split(":");
+        const mapped = arabicAyahs.map((ayah) => {
+          const sureId = ayah.surah?.number || 0;
+          const ayetNo = ayah.numberInSurah || 0;
+          const key = `${sureId}:${ayetNo}`;
           return {
-            id: verse.id,
-            sureId: Number(sureNo) || verse.chapter_id || 0,
-            ayetNo: Number(ayetNo) || verse.verse_number || 0,
-            arapca,
-            turkce: verse.translations?.[0]?.text || "",
+            id: key,
+            sureId,
+            ayetNo,
+            arapca: ayah.text || "",
+            turkce: turkishMap.get(key) || "",
             okunus: "",
           };
         });
         setApiAyetler(mapped);
       } catch (error) {
-        console.error(error);
-        setApiAyetler([]);
+        try {
+          const trResponse = await fetch(
+            "https://api.quran.com/api/v4/resources/translations?language=tr",
+          );
+          if (!trResponse.ok) throw new Error("Quran.com API hatasi");
+          const trData = await trResponse.json();
+          const translations = trData.translations || [];
+          const diyanet = translations.find((t) =>
+            (t.name || "").toLowerCase().includes("diyanet"),
+          );
+          const translationId = diyanet?.id || translations[0]?.id || null;
+          if (!translationId) throw new Error("Ceviri bulunamadi");
+
+          const response = await fetch(
+            `https://api.quran.com/api/v4/verses/by_page/${page}?language=tr&words=false&translations=${translationId}&fields=text_uthmani,text_imlaei,text_uthmani_simple&per_page=300`,
+          );
+          if (!response.ok) throw new Error("Quran.com API hatasi");
+          const data = await response.json();
+          const verses = data.verses || [];
+          const mapped = verses.map((verse) => {
+            const arapca =
+              verse.text_uthmani ||
+              verse.text_imlaei ||
+              verse.text_uthmani_simple ||
+              "";
+            const [sureNo, ayetNo] = String(verse.verse_key || "").split(":");
+            return {
+              id: verse.id,
+              sureId: Number(sureNo) || verse.chapter_id || 0,
+              ayetNo: Number(ayetNo) || verse.verse_number || 0,
+              arapca,
+              turkce: verse.translations?.[0]?.text || "",
+              okunus: "",
+            };
+          });
+          setApiAyetler(mapped);
+        } catch (fallbackError) {
+          console.error(fallbackError);
+          setApiAyetler([]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchVerses();
-  }, [page, translationId]);
+  }, [page]);
 
   useEffect(() => {
     const buildMap = (ayahs = []) =>

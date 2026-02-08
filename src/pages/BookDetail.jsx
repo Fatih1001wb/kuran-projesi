@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { kitaplarListesi } from "../data/kitaplarData";
+import { kitapIcerikMap } from "../data/kitaplarIcerik";
 
 function BookDetail() {
   const { id } = useParams();
   const bookId = Number(id);
   const kitap = kitaplarListesi.find((item) => item.id === bookId);
+  const kitapIcerik = kitapIcerikMap[bookId];
 
   if (!kitap) {
     return (

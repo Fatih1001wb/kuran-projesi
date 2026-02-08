@@ -6,6 +6,7 @@ import Sureler from "./pages/Sureler";
 import Books from "./pages/Books";
 import ReadingPage from "./pages/ReadingPage";
 import BookDetail from "./pages/BookDetail";
+import BookReading from "./pages/BookReading";
 import QuranPage from "./pages/QuranPage";
 import "./index.css";
 
@@ -98,6 +99,7 @@ function App() {
             <Route path="/sureler" element={<Sureler />} />
             <Route path="/kitaplar" element={<Books />} />
             <Route path="/kitap/:id" element={<BookDetail />} />
+            <Route path="/kitap/:id/oku" element={<BookReading />} />
             <Route path="/oku/:id" element={<ReadingPage />} />
             <Route path="/quran" element={<QuranPage />} />
           </Routes>

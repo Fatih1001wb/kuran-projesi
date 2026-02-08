@@ -910,6 +910,103 @@ nav a:hover::after {
   color: #7f8c8d;
 }
 
+/* Reading Goal Section */
+.reading-goal-section {
+  padding: 2.2rem;
+  background: linear-gradient(135deg, rgba(255, 244, 224, 0.95), #ffffff 60%);
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 10px 28px rgba(43, 37, 32, 0.08);
+}
+
+.reading-goal-section h2 {
+  font-size: 1.4rem;
+  color: #5a3f1c;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.goal-subtitle {
+  color: #6d5b48;
+  margin-bottom: 1.6rem;
+  font-size: 0.95rem;
+}
+
+.goal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.6rem;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  display: grid;
+  gap: 1.2rem;
+}
+
+.goal-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
+}
+
+.goal-label {
+  font-size: 0.9rem;
+  color: #6d5b48;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.goal-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b2520;
+}
+
+.goal-bar {
+  height: 10px;
+  background: #f2e6d0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.goal-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #ffb300);
+  border-radius: 999px;
+}
+
+.goal-status {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: #6a4f2c;
+  font-weight: 600;
+}
+
+.goal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.goal-btn {
+  background: linear-gradient(135deg, #c99724, #f0c04a);
+  color: #2b2520;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  box-shadow: 0 6px 14px rgba(201, 151, 36, 0.25);
+}
+
+.goal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(201, 151, 36, 0.3);
+}
+
 .sure-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

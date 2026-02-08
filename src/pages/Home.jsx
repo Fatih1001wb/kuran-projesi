@@ -493,12 +493,6 @@ function PrayerTimes() {
           </button>
         </div>
       </div>
-      <div className="prayer-header">
-        <span className="country-flag">{flag}</span>
-        <span className="country-name">
-          {validCity}, {selectedCountry}
-        </span>
-      </div>
       {loading && (
         <p className="loading-text">⏳ Namaz vakitleri yükleniyor...</p>
       )}
@@ -529,36 +523,113 @@ function PrayerTimes() {
 function Home() {
   return (
     <div className="page-content home-page">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <h1>Kur'an'ı Kerim</h1>
-        <p className="hero-subtitle">Müslümanların kutsal metin kaynağı</p>
-        <p className="hero-description">
-          Kur'an'ı Kerim, İslam'ın kutsal metnidir. Bu platformda Kur'an'ı
-          Kerim'in tüm surelerini okuyabilir, anlayabilir ve derinlemesine
-          inceleyebilirsiniz.
-        </p>
-      </section>
-
       {/* Namaz Vakitleri */}
       <PrayerTimes />
 
-      {/* Hızlı Erişim */}
-      <section className="quick-access-section">
-        <h2>Hızlı Erişim</h2>
-        <div className="quick-links">
-          <Link to="/sureler" className="quick-link">
-            <span className="quick-icon">📖</span>
-            <span className="quick-title">Tüm Sureler</span>
-            <span className="quick-desc">114 sure</span>
-          </Link>
-          <Link to="/kitaplar" className="quick-link">
-            <span className="quick-icon">📚</span>
-            <span className="quick-title">Kutsal Kitaplar</span>
-            <span className="quick-desc">Koleksiyon</span>
-          </Link>
+      {/* Okuma Hedefi */}
+      <section className="reading-goal-section">
+        <h2>Okuma Hedefi</h2>
+        <p className="goal-subtitle">
+          Bu hafta icin hedefini belirle ve ilerlemeni takip et.
+        </p>
+        <div className="goal-card">
+          <div className="goal-metric">
+            <span className="goal-label">Haftalik Hedef</span>
+            <span className="goal-value">7 Sure</span>
+          </div>
+          <div className="goal-progress">
+            <div className="goal-bar">
+              <span style={{ width: "35%" }} />
+            </div>
+            <div className="goal-status">2/7 tamamlandi</div>
+          </div>
+          <div className="goal-actions">
+            <Link to="/sureler" className="goal-btn">
+              Okumaya Devam Et
+            </Link>
+          </div>
         </div>
       </section>
+
+      <div className="books-meta">
+        <div className="books-card">
+          <h3>Surelerde Sik Kullanilanlar</h3>
+          <div className="chip-row">
+            <span className="meta-chip">Fatiha</span>
+            <span className="meta-chip">Yasin</span>
+            <span className="meta-chip">Mulk</span>
+          </div>
+        </div>
+        <div className="books-card">
+          <h3>Surelerde Ilerleme</h3>
+          <div className="progress-row">
+            <span>Fatiha</span>
+            <span>100%</span>
+          </div>
+          <div className="progress-bar">
+            <span style={{ width: "100%" }} />
+          </div>
+          <div className="progress-row">
+            <span>Yasin</span>
+            <span>45%</span>
+          </div>
+          <div className="progress-bar">
+            <span style={{ width: "45%" }} />
+          </div>
+        </div>
+      </div>
+
+      <section className="reading-goal-section">
+        <h2>Okuma Hedefi</h2>
+        <p className="goal-subtitle">
+          Bu ay icin kitap okuma hedefini belirle ve ilerlemeni gor.
+        </p>
+        <div className="goal-card">
+          <div className="goal-metric">
+            <span className="goal-label">Aylik Hedef</span>
+            <span className="goal-value">3 Kitap</span>
+          </div>
+          <div className="goal-progress">
+            <div className="goal-bar">
+              <span style={{ width: "33%" }} />
+            </div>
+            <div className="goal-status">1/3 tamamlandi</div>
+          </div>
+          <div className="goal-actions">
+            <Link to="/kitaplar" className="goal-btn">
+              Okumaya Devam Et
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="books-meta">
+        <div className="books-card">
+          <h3>Sik Kullanilanlar</h3>
+          <div className="chip-row">
+            <span className="meta-chip">Kur'an-i Kerim</span>
+            <span className="meta-chip">Yasin Suresi</span>
+            <span className="meta-chip">Cevsen</span>
+          </div>
+        </div>
+        <div className="books-card">
+          <h3>Ilerleme</h3>
+          <div className="progress-row">
+            <span>Kur'an-i Kerim</span>
+            <span>35%</span>
+          </div>
+          <div className="progress-bar">
+            <span style={{ width: "35%" }} />
+          </div>
+          <div className="progress-row">
+            <span>Yasin Suresi</span>
+            <span>60%</span>
+          </div>
+          <div className="progress-bar">
+            <span style={{ width: "60%" }} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

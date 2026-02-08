@@ -1,5 +1,12 @@
 # React + Vite
 
+## Veri Kaynaklari ve Atif
+
+- Arapca Kur'an metni: AlQuran.cloud API (quran-uthmani)
+- Turkce meal: AlQuran.cloud API (tr.diyanet)
+
+Kaynak: https://api.alquran.cloud
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
