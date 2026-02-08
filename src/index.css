@@ -219,7 +219,10 @@ nav a:hover::after {
 .content-wrapper {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(180px, 220px);
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(
+      180px,
+      220px
+    );
   gap: 1.5rem;
   padding: 2rem;
   max-width: 1400px;
@@ -375,7 +378,10 @@ nav a:hover::after {
 
 @media (max-width: 1024px) {
   .content-wrapper {
-    grid-template-columns: minmax(140px, 170px) minmax(0, 1fr) minmax(140px, 170px);
+    grid-template-columns: minmax(140px, 170px) minmax(0, 1fr) minmax(
+        140px,
+        170px
+      );
     gap: 1rem;
     padding: 1rem;
   }
@@ -584,6 +590,29 @@ nav a:hover::after {
 
   .ad-horizontal p {
     font-size: 0.85rem;
+  }
+
+  .ad-horizontal,
+  .sidebar,
+  footer,
+  .hero-stats,
+  .hero-badges,
+  .books-meta,
+  .quick-access-section,
+  .reading-goal-section {
+    display: none;
+  }
+
+  .content-wrapper {
+    padding: 0.5rem;
+  }
+
+  .main-content {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .home-page {
+    gap: 1.5rem;
   }
 }
 
