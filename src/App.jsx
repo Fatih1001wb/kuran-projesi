@@ -8,6 +8,9 @@ import ReadingPage from "./pages/ReadingPage";
 import BookDetail from "./pages/BookDetail";
 import BookReading from "./pages/BookReading";
 import QuranPage from "./pages/QuranPage";
+import AuthPage from "./pages/AuthPage";
+import { useAuth } from "./contexts/AuthContext";
+import { getUserProgressList } from "./services/progressService";
 import "./index.css";
 
 function App() {
@@ -15,6 +18,8 @@ function App() {
   const isHome = location.pathname === "/";
   const isQuran = location.pathname.startsWith("/quran");
   const [lastBookmark, setLastBookmark] = useState(null);
+  const [progressList, setProgressList] = useState([]);
+  const { user } = useAuth();
   const dailyDuas = [
     "Rabbimiz! Bize dünyada da iyilik ver, ahirette de iyilik ver ve bizi ateşin azabından koru.",
     "Rabbimiz! Bizi doğru yola ilettikten sonra kalplerimizi eğriltme, bize katından rahmet bağışla.",
@@ -78,6 +83,18 @@ function App() {
       window.removeEventListener("quran:bookmark-updated", handleUpdate);
   }, []);
 
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) {
+        setProgressList([]);
+        return;
+      }
+      const data = await getUserProgressList(user.uid, 3);
+      setProgressList(data);
+    };
+    loadProgress();
+  }, [user]);
+
   return (
     <div className="app-container">
       <div className="ad-horizontal">
@@ -105,6 +122,7 @@ function App() {
             <Route path="/kitap/:id/oku" element={<BookReading />} />
             <Route path="/oku/:id" element={<ReadingPage />} />
             <Route path="/quran" element={<QuranPage />} />
+            <Route path="/giris" element={<AuthPage />} />
           </Routes>
         </main>
 
@@ -112,7 +130,48 @@ function App() {
         <aside className="sidebar sidebar-right">
           <div className="ad-vertical">
             {isHome ? (
-              <></>
+              <div className="progress-summary-sidebar">
+                <h4>Ilerleme Ozeti</h4>
+                {user ? (
+                  progressList.length ? (
+                    <div className="progress-summary-grid">
+                      {progressList.map((item) => {
+                        const total = item.totalAyet || 0;
+                        const percent = total
+                          ? Math.min(
+                              100,
+                              Math.round((item.lastAyetNo / total) * 100),
+                            )
+                          : 0;
+                        return (
+                          <div
+                            key={item.sureId || item.id}
+                            className="progress-summary-card"
+                          >
+                            <div className="progress-summary-title">
+                              {item.sureAd || `Sure ${item.sureId}`}
+                            </div>
+                            <div className="progress-summary-meta">
+                              {item.lastAyetNo || 0}/{total}
+                            </div>
+                            <div className="progress-summary-bar">
+                              <span style={{ width: `${percent}%` }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="progress-summary-empty">
+                      Henuz ilerleme yok. Bir sure okumaya basla.
+                    </p>
+                  )
+                ) : (
+                  <p className="progress-summary-empty">
+                    Ilerleme kaydi icin giris yap.
+                  </p>
+                )}
+              </div>
             ) : isQuran ? (
               <>
                 <h4>🔖 Yer İşareti</h4>

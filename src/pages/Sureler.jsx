@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { sureListesi } from "../data/surelerData";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserProgressMap } from "../services/progressService";
 
 function Sureler() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,7 +10,9 @@ function Sureler() {
   const [motivation, setMotivation] = useState("");
   const [sureler, setSureler] = useState(sureListesi);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
+  const [progressMap, setProgressMap] = useState({});
   const favoritesKey = "favoriteSureIds";
+  const { user } = useAuth();
 
   const normalizeText = (value) =>
     value
@@ -88,6 +92,18 @@ function Sureler() {
     };
   }, []);
 
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) {
+        setProgressMap({});
+        return;
+      }
+      const data = await getUserProgressMap(user.uid);
+      setProgressMap(data);
+    };
+    loadProgress();
+  }, [user]);
+
   return (
     <div className="page-content">
       <div className="hero-section">
@@ -116,6 +132,12 @@ function Sureler() {
           <span className="divider-icon">✨</span>
           <span className="divider-text">{motivation}</span>
         </div>
+
+        {!user && (
+          <div className="progress-hint">
+            Ilerleme kaydi icin giris yap.
+          </div>
+        )}
 
         <div className="sure-search">
           <div className="search-field">
@@ -167,6 +189,35 @@ function Sureler() {
         <div className="sure-grid">
           {filteredSureler.map((sure) => (
             <Link to={`/oku/${sure.id}`} key={sure.id} className="sure-kutu">
+              {progressMap[String(sure.id)] && (
+                <div className="sure-progress">
+                  <div className="sure-progress-label">
+                    Ilerleme: %
+                    {Math.min(
+                      100,
+                      Math.round(
+                        ((progressMap[String(sure.id)]?.lastAyetNo || 0) /
+                          (sure.ayetSayisi || 1)) *
+                          100,
+                      ),
+                    )}
+                  </div>
+                  <div className="sure-progress-bar">
+                    <span
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.round(
+                            ((progressMap[String(sure.id)]?.lastAyetNo || 0) /
+                              (sure.ayetSayisi || 1)) *
+                              100,
+                          ),
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               {favoriteIds.has(sure.id) && (
                 <span className="fav-badge">✔ Favori</span>
               )}

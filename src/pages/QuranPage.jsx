@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import AyetCard from "../components/AyetCard";
 import { sureListesi } from "../data/surelerData";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserProgressMap, setSurahProgress } from "../services/progressService";
 
 const TOTAL_PAGES = 604;
 
@@ -13,7 +15,9 @@ function QuranPage() {
   const [playingId, setPlayingId] = useState(null);
   const [translitCache, setTranslitCache] = useState({});
   const [bookmarks, setBookmarks] = useState([]);
+  const [progressMap, setProgressMap] = useState({});
   const audioRef = useRef(null);
+  const { user } = useAuth();
 
   const rawPage = Number(searchParams.get("page") || "1");
   const page = Number.isFinite(rawPage)
@@ -29,6 +33,15 @@ function QuranPage() {
     () =>
       sureListesi.reduce((acc, sure) => {
         acc[sure.id] = sure.ad;
+        return acc;
+      }, {}),
+    [],
+  );
+
+  const sureTotalMap = useMemo(
+    () =>
+      sureListesi.reduce((acc, sure) => {
+        acc[sure.id] = sure.ayetSayisi;
         return acc;
       }, {}),
     [],
@@ -116,6 +129,34 @@ function QuranPage() {
   useEffect(() => {
     setBookmarks(readBookmarks());
   }, [page, sureNameMap]);
+
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) {
+        setProgressMap({});
+        return;
+      }
+      const data = await getUserProgressMap(user.uid);
+      setProgressMap(data);
+    };
+    loadProgress();
+  }, [user]);
+
+  const handleMarkRead = async (ayet) => {
+    if (!user) return;
+    const totalAyet = sureTotalMap[ayet.sureId] || 0;
+    const payload = {
+      sureId: ayet.sureId,
+      sureAd: sureNameMap[ayet.sureId] || `Sure ${ayet.sureId}`,
+      lastAyetNo: ayet.ayetNo,
+      totalAyet,
+    };
+    await setSurahProgress(user.uid, payload);
+    setProgressMap((prev) => ({
+      ...prev,
+      [String(ayet.sureId)]: payload,
+    }));
+  };
 
   useEffect(() => {
     const fetchVerses = async () => {
@@ -395,6 +436,14 @@ function QuranPage() {
           onListen={() => playAyet(ayet.id)}
           onBookmark={() => toggleBookmark(ayet)}
           isBookmarked={bookmarkKeys.has(getBookmarkId(ayet))}
+          onMarkRead={() => handleMarkRead(ayet)}
+          isRead={
+            Boolean(
+              progressMap[String(ayet.sureId)]?.lastAyetNo &&
+                ayet.ayetNo <=
+                  progressMap[String(ayet.sureId)]?.lastAyetNo,
+            )
+          }
         />
       ))}
     </div>

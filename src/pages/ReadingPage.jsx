@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ornekAyetler, sureListesi } from "../data/surelerData";
 import AyetCard from "../components/AyetCard";
+import { useAuth } from "../contexts/AuthContext";
+import { getSurahProgress, setSurahProgress } from "../services/progressService";
 
 function ReadingPage() {
   const { id } = useParams();
@@ -11,7 +13,10 @@ function ReadingPage() {
   const [apiAyetler, setApiAyetler] = useState([]);
   const [loading, setLoading] = useState(false);
   const [translitMap, setTranslitMap] = useState({});
+  const [progress, setProgress] = useState(null);
+  const [progressError, setProgressError] = useState("");
   const audioRef = useRef(null);
+  const { user } = useAuth();
 
   const sureId = Number(id);
   const favoritesKey = "favoriteSureIds";
@@ -33,6 +38,14 @@ function ReadingPage() {
     [ayetler, translitMap],
   );
   const hasAyet = displayAyetler.length > 0;
+  const totalAyet = useMemo(() => {
+    const fromList = sureListesi.find((item) => item.id === sureId)?.ayetSayisi;
+    return fromList || displayAyetler.length || 0;
+  }, [sureId, displayAyetler.length]);
+  const lastAyetNo = progress?.lastAyetNo || 0;
+  const progressPercent = totalAyet
+    ? Math.min(100, Math.round((lastAyetNo / totalAyet) * 100))
+    : 0;
 
   const pad = (value) => String(value).padStart(3, "0");
   const getAudioUrl = (sureNo, ayetNo) =>
@@ -209,6 +222,34 @@ function ReadingPage() {
     setIsFavorite(favorites.has(sureId));
   }, [sureId]);
 
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user || !sureId) {
+        setProgress(null);
+        return;
+      }
+      const data = await getSurahProgress(user.uid, sureId);
+      setProgress(data);
+    };
+    loadProgress();
+  }, [user, sureId]);
+
+  const handleMarkRead = async (ayetNo) => {
+    if (!user) {
+      setProgressError("Ilerleme icin giris yap.");
+      return;
+    }
+    setProgressError("");
+    const payload = {
+      sureId,
+      sureAd: localName || `Sure ${sureId}`,
+      lastAyetNo: ayetNo,
+      totalAyet,
+    };
+    await setSurahProgress(user.uid, payload);
+    setProgress(payload);
+  };
+
   return (
     <div className="reading-container">
       {/* Üst Reklam Alanı - Hazırda bekliyor */}
@@ -236,6 +277,24 @@ function ReadingPage() {
         >
           {isFavorite ? "★ Favoriden çıkar" : "☆ Favoriye ekle"}
         </button>
+      </div>
+
+      <div className="reading-progress">
+        {user ? (
+          <>
+            <div className="progress-label">
+              Ilerleme: {lastAyetNo}/{totalAyet} (%{progressPercent})
+            </div>
+            <div className="progress-bar">
+              <span style={{ width: `${progressPercent}%` }} />
+            </div>
+          </>
+        ) : (
+          <div className="progress-label progress-guest">
+            Ilerleme kaydi icin giris yap.
+          </div>
+        )}
+        {progressError && <div className="progress-error">{progressError}</div>}
       </div>
 
       <div className="mode-toggle">
@@ -271,6 +330,8 @@ function ReadingPage() {
           mode={mode}
           isPlaying={playingId === ayet.id}
           onListen={() => playAyet(ayet.id)}
+          onMarkRead={() => handleMarkRead(ayet.ayetNo)}
+          isRead={Boolean(lastAyetNo && ayet.ayetNo <= lastAyetNo)}
         />
       ))}
     </div>

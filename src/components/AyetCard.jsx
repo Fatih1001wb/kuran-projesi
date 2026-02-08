@@ -7,6 +7,8 @@ function AyetCard({
   isPlaying = false,
   onBookmark,
   isBookmarked = false,
+  onMarkRead,
+  isRead = false,
 }) {
   const sureLabel = ayet.sureAd
     ? `${ayet.sureAd} Suresi`
@@ -27,6 +29,11 @@ function AyetCard({
           {onBookmark ? (
             <button type="button" onClick={onBookmark}>
               {isBookmarked ? "🔖 İşaretli" : "📌 İşaretle"}
+            </button>
+          ) : null}
+          {onMarkRead ? (
+            <button type="button" className="read-button" onClick={onMarkRead}>
+              {isRead ? "✓ Okundu" : "Okudum"}
             </button>
           ) : null}
         </div>

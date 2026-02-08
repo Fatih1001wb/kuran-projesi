@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 function Navbar() {
+  const { user, signOutUser } = useAuth();
   return (
     <header className="navbar">
       <div className="logo-container">
@@ -14,6 +16,16 @@ function Navbar() {
         <Link to="/">Ana Sayfa</Link>
         <Link to="/sureler">Sureler</Link>
         <Link to="/kitaplar">Kitaplar</Link>
+        {user ? (
+          <span className="nav-user">
+            <span className="nav-user-email">{user.email}</span>
+            <button type="button" className="nav-button" onClick={signOutUser}>
+              Cikis
+            </button>
+          </span>
+        ) : (
+          <Link to="/giris">Giris</Link>
+        )}
       </nav>
     </header>
   );

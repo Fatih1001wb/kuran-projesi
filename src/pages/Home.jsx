@@ -5,7 +5,6 @@ function PrayerTimes() {
   const [prayerTimes, setPrayerTimes] = useState({
     Imsak: "04:30",
     Gunes_Dogus: "08:00",
-    Sabah: "05:00",
     Ogle: "12:00",
     Ikindi: "15:00",
     Aksam: "18:00",
@@ -16,14 +15,34 @@ function PrayerTimes() {
   const [selectedCountry, setSelectedCountry] = useState("Türkiye");
   const [selectedCity, setSelectedCity] = useState("İstanbul");
 
+  const buildCacheKey = (latitude, longitude, dateKey) =>
+    `prayerTimes:${latitude.toFixed(3)}:${longitude.toFixed(3)}:${dateKey}`;
+
   // API'den gerçek namaz vakitleri al
   const fetchPrayerTimes = async (latitude, longitude) => {
     setLoading(true);
     setError(null);
-    try {
-      const today = new Date();
-      const date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
 
+    const today = new Date();
+    const date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+    const dateKey = `${today.getFullYear()}-${String(
+      today.getMonth() + 1,
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const cacheKey = buildCacheKey(latitude, longitude, dateKey);
+    let hasCache = false;
+
+    try {
+      const cachedRaw = localStorage.getItem(cacheKey);
+      const cached = cachedRaw ? JSON.parse(cachedRaw) : null;
+      if (cached?.timings) {
+        setPrayerTimes(cached.timings);
+        hasCache = true;
+      }
+    } catch {
+      hasCache = false;
+    }
+
+    try {
       const response = await fetch(
         `https://api.aladhan.com/v1/timings/${date}?latitude=${latitude}&longitude=${longitude}&method=13&school=0`,
       );
@@ -32,18 +51,25 @@ function PrayerTimes() {
 
       const data = await response.json();
       const timings = data.data.timings;
-
-      setPrayerTimes({
+      const nextTimings = {
         Imsak: timings.Imsak,
         Gunes_Dogus: timings.Sunrise,
-        Sabah: timings.Fajr,
         Ogle: timings.Dhuhr,
         Ikindi: timings.Asr,
         Aksam: timings.Maghrib,
         Yatsi: timings.Isha,
-      });
+      };
+      setPrayerTimes(nextTimings);
+
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ timings: nextTimings }));
+      } catch {
+        // Cache yazimi basarisiz olsa da akisi bozma.
+      }
     } catch (err) {
-      setError("Namaz vakitleri yüklenemedi");
+      if (!hasCache) {
+        setError("Namaz vakitleri yüklenemedi.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
@@ -500,13 +526,12 @@ function PrayerTimes() {
       <div className="prayer-times">
         {Object.entries(prayerTimes).map(([name, time]) => {
           const labels = {
-            Imsak: "🌙 Imsak",
-            Gunes_Dogus: "🌅 Gunes Dogus",
-            Sabah: "🕌 Sabah Ezani",
-            Ogle: "☀️ Ogle",
-            Ikindi: "🕐 Ikindi",
-            Aksam: "🌆 Aksam",
-            Yatsi: "🌃 Yatsi",
+            Imsak: "Imsak",
+            Gunes_Dogus: "Gunes Dogus",
+            Ogle: "Ogle",
+            Ikindi: "Ikindi",
+            Aksam: "Aksam",
+            Yatsi: "Yatsi",
           };
           return (
             <div className="prayer-row" key={name}>
