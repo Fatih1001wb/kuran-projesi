@@ -60,6 +60,29 @@ body {
   flex-direction: column;
 }
 
+.ad-horizontal {
+  background: #fff7e1;
+  border-bottom: 1px solid rgba(139, 116, 88, 0.25);
+  color: #5a4b3f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px;
+  text-align: center;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.ad-horizontal p {
+  margin: 0;
+  padding: 0.5rem 1rem;
+}
+
+.ad-horizontal-bottom {
+  border-bottom: none;
+  border-top: 1px solid rgba(139, 116, 88, 0.25);
+}
+
 .navbar {
   background: linear-gradient(
     135deg,
@@ -290,6 +313,24 @@ nav a:hover::after {
   box-shadow: 0 8px 18px rgba(43, 37, 32, 0.12);
 }
 
+.daily-dua-section {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  padding: 1.8rem 2rem;
+  box-shadow: 0 12px 28px rgba(43, 37, 32, 0.08);
+}
+.daily-dua-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #2b2520;
+}
+.daily-dua-card {
+  background: linear-gradient(135deg, #fff7e1 0%, #fffdf7 100%);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid rgba(139, 116, 88, 0.2);
+}
 .sidebar-left .ad-vertical {
   background: #f0f4f8;
   border-color: #d4dce6;

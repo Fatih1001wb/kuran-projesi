@@ -456,7 +456,7 @@ function PrayerTimes() {
   return (
     <section className="featured-section prayer-global">
       <div className="section-header">
-        <h2>🌍 Dünya Namaz Vakitleri</h2>
+        <h2>Dünya Namaz Vakitleri</h2>
         <div className="location-row">
           <select
             value={selectedCountry}
@@ -520,9 +520,19 @@ function PrayerTimes() {
   );
 }
 
-function Home() {
+function Home({ dailyDua }) {
   return (
     <div className="page-content home-page">
+      <section className="daily-dua-section">
+        <h2>Günlük Dua</h2>
+        <div className="daily-dua-card">
+          <p className="daily-dua-title">Günün Duası</p>
+          <p className="daily-dua-text">
+            "{dailyDua || "Günlük dua yüklenemedi."}"
+          </p>
+        </div>
+      </section>
+
       {/* Namaz Vakitleri */}
       <PrayerTimes />
 

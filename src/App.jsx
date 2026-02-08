@@ -80,6 +80,9 @@ function App() {
 
   return (
     <div className="app-container">
+      <div className="ad-horizontal">
+        <p>Reklam Alanı - 728x90</p>
+      </div>
       {/* Navbar her sayfada sabit kalacak */}
       <Navbar />
 
@@ -95,7 +98,7 @@ function App() {
         <main className="main-content">
           <Routes>
             {/* Tarayıcı adresine göre hangi sayfayı göstereceğini seçiyor */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home dailyDua={dailyDua} />} />
             <Route path="/sureler" element={<Sureler />} />
             <Route path="/kitaplar" element={<Books />} />
             <Route path="/kitap/:id" element={<BookDetail />} />
@@ -109,11 +112,7 @@ function App() {
         <aside className="sidebar sidebar-right">
           <div className="ad-vertical">
             {isHome ? (
-              <>
-                <h4>🌙 Günlük Dua</h4>
-                <p className="daily-dua-title">Günün Duası</p>
-                <p className="daily-dua-text">"{dailyDua}"</p>
-              </>
+              <></>
             ) : isQuran ? (
               <>
                 <h4>🔖 Yer İşareti</h4>
@@ -148,6 +147,10 @@ function App() {
             )}
           </div>
         </aside>
+      </div>
+
+      <div className="ad-horizontal ad-horizontal-bottom">
+        <p>Reklam Alanı - 728x90</p>
       </div>
 
       {/* Footer her sayfada sabit */}
